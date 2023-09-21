@@ -1,0 +1,23 @@
+{
+    "name": "dannsbass/waqfeyabot",
+    "type": "bot",
+    "description": "Telegram Bot for searching Islamic books",
+    "keywords": [
+        "Waqfeya",
+        "Telegram bot",
+        "Telegram bot for waqfeya"
+    ],
+    "homepage": "https://github.com/dannsbass/waqfeyabot",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Danns Bass",
+            "email": "dannsbass@gmail.com",
+            "homepage": "https://github.com/dannsbass",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "dannsbass/bots": "^0.0.1"
+    }
+}
