@@ -10,8 +10,7 @@ Bot::text(function ($text) {
     if ($type == "group" or $type == "supergroup" or $type == 'private') {
         if (preg_match('/^(\#kitab|كتاب)(.*)/i', $text, $bagian)) {
             $kitab = trim($bagian[2]);
-            Bot::bg_exec('cariKitab', array($kitab), 'require "config.php";', 1000);
-            return Bot::sendMessage('Tunggu sebentar...');
+            Bot::bg_exec('cariKitab', array($kitab), 'require "config.php";', 1000, true);
         }
     }
 

@@ -1,5 +1,5 @@
 <?php
-require(__DIR__ . '/bots/Bot.php');
+require(__DIR__ . '/vendor/autoload.php');
 require(__DIR__ . '/simple_html_dom.php');
 require(__DIR__ . '/func.php');
 require(__DIR__ . '/token.php');

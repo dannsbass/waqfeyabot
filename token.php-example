@@ -1,0 +1,10 @@
+<?php
+define('TOKEN_BOT', '144469****:AAEE2kP2hyXO4****TQdkIBb9myyWzrhc7s');
+define('NAMA_BOT', 'ExampleYourBot');
+define('WEBHOOK', 'https://your-domain.com/your_bot_script.php');
+define('USERNAME_CHANNEL', 'your_channel_name');
+define('ID_CHANNEL', -100**********);
+define('ADMIN_ID', 123********);
+
+Dannsheet::setCredentials(__DIR__ . '/credentials.json');
+Dannsheet::setSpreasheetId('1_cQzy-S0YTtQOdsqoLJL0Y96N0A3x5vwIdLr6M****');

@@ -18,6 +18,7 @@
         }
     ],
     "require": {
-        "dannsbass/bots": "^0.0.1"
+        "dannsbass/google-sheets": "^1.0",
+        "dannsbass/bots": "^0.0.3"
     }
 }

@@ -1,3 +1,6 @@
-bots/
+vendor/
 token.php
+credentials.json
 deleteMessage.php
+nang
+debug.txt

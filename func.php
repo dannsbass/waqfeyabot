@@ -90,21 +90,9 @@ function sedothtml($url, $postfields = [], $headers = [])
     return $html; #string
 }
 
-function bikin_file($sumber, $bid, $teks)
-{
-    $namafile = "{$sumber}_{$bid}.html";
-    $f = fopen($namafile, 'w');
-    $teks = "<meta name='viewport' content='initial-scale = 1.0, maximum-scale = 1.0, user-scalable = yes, width = device-width'><p lang='ar' dir='rtl' align='right'><style>a{text-decoration:none}</style>$teks";
-    fwrite($f, $teks);
-    fclose($f);
-    Bot::sendDocument($namafile);
-    unlink($namafile);
-}
-
 function cariKitab($text)
 {
     #sumber: database sendiri
-    Bot::sendChatAction('typing');
     $konten = file_get_contents(DBDUMP);
     $konten = explode(SEPARATOR_DBDUMP, $konten);
     $ada = false;
@@ -112,17 +100,18 @@ function cariKitab($text)
     foreach ($konten as $value) {
         if (strpos($value, $text) !== false){
             $ada = true;
+            Bot::sendChatAction('upload_document');
             cek($value);
         }
     }
 
     # database sendiri (waqfeya)
-    Bot::sendChatAction('typing');
     $items = explode(SEPARATOR_DATABASE_WAQFEYA, file_get_contents(DATABASE_WAQFEYA));
     $cari = preg_grep("/$text/", $items);
     $jumlah = count($cari);
     $hasil_wqf = '';
     if ($jumlah > 0) {
+        Bot::sendChatAction('upload_document');
         foreach ($cari as $bid => $konten) {
             #$bid = $bid + 1;
             $x = ['target=_blank', 'style="color:#990000;"', 'target="_blank"'];
@@ -135,7 +124,6 @@ function cariKitab($text)
 
     #sumber: waqfeyah.wordpress.com
     #$text = 'البخاري';
-    Bot::sendChatAction('typing');
     $html = sedothtml("https://waqfeyah.wordpress.com/?s=" . $text);
     preg_match_all('/<h1 class="entry-title"><a href="(.*)" rel="bookmark">([^\<\>]+)\<\/a\>/i', $html, $ke);
     if (count($ke[1]) > 0) {
@@ -194,7 +182,7 @@ function cariKitab($text)
     $links = array_combine($urls, $juduls);
     $waqfeyah_wp = '';
     if (count($links) > 0) {
-
+        Bot::sendChatAction('upload_document');
         $no = 1;
         foreach ($links as $url => $judul) {
             cek("<a href='$url'>$judul</a>");
@@ -204,8 +192,23 @@ function cariKitab($text)
         kirim_html("waqfeyah.wp", $waqfeyah_wp);
     }
 
+    #Google Sheets (WaqfeyaBot)
+    $hasil_dari_sheet = Dannsheet::findRowByValue($text, 'WaqfeyaBot!A1:A', false);
+    if (is_array($hasil_dari_sheet) && count($hasil_dari_sheet) > 0){
+        Bot::sendChatAction('upload_document');
+        $ada = true;
+        foreach ($hasil_dari_sheet as $no) {
+            $isi = Dannsheet::getValues("WaqfeyaBot!A$no:A$no");
+            if(!$isi) break;
+            foreach($isi as $array){
+                foreach($array as $value){
+                    cek($value);
+                }
+            }
+        }
+    }
+
     #sumber3
-    Bot::sendChatAction('typing');
     $keyword = urlencode($text);
     $url = "http://maktabahkita.blogspot.com/search?q=$keyword";
     $ch = curl_init($url);
@@ -217,7 +220,7 @@ function cariKitab($text)
     preg_match_all('/http([^\'\"\<\>\{\}\*\$\|]+)\.(pdf|doc|docx|zip|rar)/i', $konten, $ke);
     $maktabahkita = '';
     if (count($ke[0]) > 0) {
-
+        Bot::sendChatAction('upload_document');
         $no = 1;
         foreach ($ke[0] as $link) {
             cek("<a href='$link'>$link</a>");
@@ -228,7 +231,6 @@ function cariKitab($text)
     }
 
     #sumber4 (archive)
-    Bot::sendChatAction('typing');
     $query = urlencode($text);
     $url = "https://archive.org/search.php?query=$query";
     $ch = curl_init($url);
@@ -241,11 +243,12 @@ function cariKitab($text)
     $links = $ke[1];
     preg_match_all('/\<div class\="ttl"\>([^\<\>]+)\<\/div\>/', $konten, $ke);
     $juduls = $ke[1];
-
+    
     $hasil = array_combine($links, $juduls);
     $total = count($hasil);
     $archive = '';
     if ($total > 0) {
+        Bot::sendChatAction('upload_document');
         $no = 1;
         foreach ($hasil as $url => $judul) {
             $archive .= "$no. <a href='https://archive.org$url'>" . trim($judul) . "</a><br>\n";
@@ -263,10 +266,7 @@ function cariKitab($text)
 function tambahKitab($teks)
 {
     if (!empty($teks) and preg_match('/http/i', $teks)) {
-        $respon = file_put_contents(DBDUMP, $teks . SEPARATOR_DBDUMP, FILE_APPEND)
-        ? "kitab berhasil ditambahkan\n"
-        : "gagal menambahkan kitab\n";
-        return cek("$respon:\n$teks", ['chat_id' => ADMIN_ID]);
+        if (!Dannsheet::findRowByValue($teks, 'WaqfeyaBot!A1:A', false)) return Dannsheet::appendRow([[$teks]], 'WaqfeyaBot');
     }
 }
 
